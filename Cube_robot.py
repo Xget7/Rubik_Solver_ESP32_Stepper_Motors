@@ -1,45 +1,46 @@
+import RPi.GPIO as GPIO
 import time
+from RpiMotorLib import RpiMotorLib
+from gpiozero import AngularServo
 
-class Cube: 
 
-    #define GPIO pins
+class Cube:
+    def __init__(self):
+        # STEPPER MOTORS PIN IN
+        # downRotPin
+        self.STEP_A_PIN_DIRECTION = 17
+        self.STEP_A_PIN_STEP = 27
 
-    #STEPPER MOTORS PIN IN
-    #downRotPin
-    STEP_A_PIN_DIRECTION = 22 # Direction (DIR) GPIO Pin
-    STEP_A_PIN_STEP = 23 # Step GPIO Pin
+        # backRotPin
+        self.STEP_B_PIN_DIRECTION = 26
+        self.STEP_B_PIN_STEP = 6
 
-    #backRotPin
-    STEP_B_PIN_DIRECTION = 22#  Direction (DIR) GPIO Pin
-    STEP_B_PIN_STEP = 23 # Step GPIO Pin
-
-    #SERVO MOTORS PIN IN
-    SERVO_A_DIGITAL_PIN = 6 #downPinchPin
-    SERVO_B_DIGITAL_PIN = 2 #backPinchPin
-
-    SEIZE = 12
+        # SERVO MOTORS PIN IN
+        self.SERVO_A_DIGITAL_PIN = 13
+        self.SERVO_B_DIGITAL_PIN = 19
+        self.SEIZE = 12
 
     def delay(seconds):
         time.sleep(seconds)
 
-    def toStep(self,degrees):
-        return (degrees/1.8) #Stepper resolution
+    def toStep(self, degrees):
+        return int((degrees/1.8))  # Stepper resolution
 
     def begin(self, speed):
-
-        self.servo_a = 1 #AngularServo(SERVO_A_DIGITAL_PIN, min_pulse_width=0.0006, max_pulse_width=0.0023)
-        self.servo_b = 2 #AngularServo(SERVO_B_DIGITAL_PIN, min_pulse_width=0.0006, max_pulse_width=0.0023)
-        
-        self.step_a = 3#RpiMotorLib.A4988Nema(STEP_A_PIN_DIRECTION, STEP_A_PIN_STEP, (17,17,17), "DRV8825")
-        self.step_b = 4#RpiMotorLib.A4988Nema(STEP_B_PIN_DIRECTION, STEP_B_PIN_STEP, (17,17,17), "DRV8825")
-
-        #GRADOS
-
+        self.servo_a = AngularServo(
+            self.SERVO_A_DIGITAL_PIN, min_pulse_width=0.0006, max_pulse_width=0.0023)
+        self.servo_b = AngularServo(
+            self.SERVO_B_DIGITAL_PIN, min_pulse_width=0.0006, max_pulse_width=0.0023)
+        self.step_a = RpiMotorLib.A4988Nema(
+            self.STEP_A_PIN_DIRECTION, self.STEP_A_PIN_STEP, (17, 17, 17), "DRV8825")
+        self.step_b = RpiMotorLib.A4988Nema(
+            self.STEP_B_PIN_DIRECTION, self.STEP_B_PIN_STEP, (17, 17, 17), "DRV8825")
+        # GRADOS
         self._downClose = 52
         self._downOpen = 125
         self._downCW = 176
         self._downCCW = 7
-        self._downMid = 92
+        self._downMid = 94
         self._backClose = 35
         self._backOpen = 115
         self._backCW = 173
@@ -49,19 +50,19 @@ class Cube:
 
         self.downArmCenter()
         self.backArmCenter()
-        
-    # write(value, speed, wait) - wait is a boolean 
+
+    # write(value, speed, wait) - wait is a boolean
     # that, if true, causes the function call to block
     # until move is complete
-    
-    def downSetLimits(self,Close,Open,CW,Mid,CCW):
+
+    def downSetLimits(self, Close, Open, CW, Mid, CCW):
         self._downClose = Close
         self._downOpen = Open
         self._downCW = CW
         self._downCCW = CCW
         self._downMid = Mid
 
-    def backSetLimits(self,Close,Open,CW,Mid,CCW):
+    def backSetLimits(self, Close, Open, CW, Mid, CCW):
         self._backClose = Close
         self._backOpen = Open
         self._backCW = CW
@@ -69,11 +70,11 @@ class Cube:
         self._backMid = Mid
         self.downArmCenter()
         self.backArmCenter()
-    
+
     def grip(self):
         print("grip")
-        # self.servo_a.angle = self._downClose
-        # self.servo_b.angle = self._downClose
+        self.servo_a.angle = self._downClose
+        self.servo_b.angle = self._downClose
 
     def seize(self):
         print("Seize ")
@@ -86,7 +87,7 @@ class Cube:
         # self.servo_b.angle = self._backClose + self.SEIZE + 4
         # self.delay(50)
         # self.servo_a.angle = self._downClose
-        # self.servo_b.angle = self._backClose 
+        # self.servo_b.angle = self._backClose
 
     def gripSoft(self):
         print(f" GripSoft {self._downClose} + {self.SEIZE - 2}")
@@ -98,11 +99,10 @@ class Cube:
         # self.servo_a.angle = self._downClose + self.SEIZE + 2
         # self.servo_b.angle = self._backClose + self.SEIZE + 2
 
+    # rubik sides
 
-    #rubik sides
-
-    def D(self,type):
-        self.grip();
+    def D(self, type):
+        self.grip()
         if (type == 1):
             self.downArmCW()
         elif (type == 2):
@@ -110,13 +110,13 @@ class Cube:
             self.downArm_OpenCenterClose()
             self.delay(200)
             self.downArmCW()
-        
+
         elif (type == 3):
             self.downArmCCW()
 
         self.downArm_OpenCenterClose()
 
-    def B(self,type):
+    def B(self, type):
         self.grip()
         if (type == 1):
             self.backArmCW()
@@ -125,9 +125,9 @@ class Cube:
             self.backArm_OpenCenterClose()
             self.delay(200)
             self.backArmCW()
-        
+
         elif (type == 3):
-           self.downArmCCW()
+            self.downArmCCW()
 
         self.backArm_OpenCenterClose()
 
@@ -139,8 +139,7 @@ class Cube:
         self.backArmOpen_downArmCCW_backArmClose()
         self.downArm_OpenCenterClose()
 
-
-    def L(self , type):
+    def L(self, type):
         self.grip()
         self.backArmOpen_downArmCCW_backArmClose()
         self.downArm_OpenCenterClose()
@@ -149,7 +148,7 @@ class Cube:
         self.downArm_OpenCenterClose()
 
     def U(self, type):
-        self.grip();
+        self.grip()
         self.downArmOpen_backArmCW_downArmClose()
         self.backArm_OpenCenterClose()
         self.downArmOpen_backArmCW_downArmClose()
@@ -161,16 +160,16 @@ class Cube:
         self.backArm_OpenCenterClose()
 
     def Fr(self, type):
-        self.grip();
-        self.backArmOpen_downArmCW_backArmClose();
-        self.downArm_OpenCenterClose();
-        self.backArmOpen_downArmCW_backArmClose();
-        self.downArm_OpenCenterClose();
-        self.B(type);
-        self.backArmOpen_downArmCW_backArmClose();
-        self.downArm_OpenCenterClose();
-        self.backArmOpen_downArmCW_backArmClose();
-        self.downArm_OpenCenterClose();
+        self.grip()
+        self.backArmOpen_downArmCW_backArmClose()
+        self.downArm_OpenCenterClose()
+        self.backArmOpen_downArmCW_backArmClose()
+        self.downArm_OpenCenterClose()
+        self.B(type)
+        self.backArmOpen_downArmCW_backArmClose()
+        self.downArm_OpenCenterClose()
+        self.backArmOpen_downArmCW_backArmClose()
+        self.downArm_OpenCenterClose()
 
 
 #  ----< Scan functions (f r b l u d) >-----------------------------
@@ -194,15 +193,13 @@ class Cube:
     def scanUp(self):
         self.delay(0.5)
         self.x(2)
-    
 
     def scanDown(self):
         self.delay(0.5)
         self.x(3)
         self.y(3)
-    
 
-    def x(self,type):
+    def x(self, type):
         self.grip()
         self.backArmOpen_downArmCCW_backArmClose()
         self.downArmOpen()
@@ -210,13 +207,13 @@ class Cube:
         if (type == 1):
             self.backArmCCW()
 
-        elif (type == 2):   
+        elif (type == 2):
             self.backArmCW()
             self.downArmClose()
             self.backArm_OpenCenterClose()
             self.downArmOpen()
             self.backArmCW()
-    
+
         elif (type == 3):
             self.backArmCW()
             self.downArmClose()
@@ -228,7 +225,7 @@ class Cube:
             self.reseat()
             self.gripSoft()
 
-    def y(self,type):
+    def y(self, type):
         self.self.grip()
         if(type == 1):
             self.self.backArmOpen_downArmCCW_backArmClose()
@@ -238,7 +235,7 @@ class Cube:
             self.self.reseat()
             self.self.gripSoft()
 
-    def z(self,type):
+    def z(self, type):
         self.grip()
         if(type == 1):
             self.self.downArmOpen_backArmCCW_downArmClose()
@@ -248,17 +245,16 @@ class Cube:
             self.self.reseat()
             self.self.gripSoft()
 
-
     def backArmCenter(self):
         print(f"{self.step_a} backArmCenter")
-        # step_a.motor_go(
-        #     False, # True=Clockwise, False=Counter-Clockwise
-        #     "Full" , # Step type (Full,Half,1/4,1/8,1/16,1/32)
-        #     toStep(_downMid), # number of steps
-        #     .0005, # step delay [sec]
-        #     False, # True = print verbose output 
-        #     .05
-        # ) # initial delay [sec]
+        self.step_a.motor_go(
+            False,  # True=Clockwise, False=Counter-Clockwise
+            "Full",  # Step type (Full,Half,1/4,1/8,1/16,1/32)
+            self.toStep(self._downMid),  # number of steps
+            .0005,  # step delay [sec]
+            False,  # True = print verbose output
+            .05
+        )  # initial delay [sec]
 
     def backArmCCW(self):
         print(f"{self.step_b} + {self.step_a}  backArmCCW")
@@ -267,7 +263,7 @@ class Cube:
         #     "Full" , # Step type (Full,Half,1/4,1/8,1/16,1/32)
         #     toStep(_backCCW), # number of steps
         #     .0005, # step delay [sec]
-        #     False, # True = print verbose output 
+        #     False, # True = print verbose output
         #     .05
         # ) # initial delay [sec]
         # step_a.motor_go(
@@ -275,93 +271,91 @@ class Cube:
         #     "Full" , # Step type (Full,Half,1/4,1/8,1/16,1/32)
         #     toStep(_backCCW), # number of steps
         #     .0005, # step delay [sec]
-        #     False, # True = print verbose output 
+        #     False, # True = print verbose output
         #     .05
         # ) # initial delay [sec]
-
 
     def downArmCW(self):
-        print(f"{self.step_a }downArmCW") 
-        # self.step_a.motor_go(
-        #     False, # True=Clockwise, False=Counter-Clockwise
-        #     "Full" , # Step type (Full,Half,1/4,1/8,1/16,1/32)
-        #     toStep(_downCW -3), # number of steps
-        #     .0005, # step delay [sec]
-        #     False, # True = print verbose output 
-        #     .05
-        # ) # initial delay [sec]
-        # self.step_a.motor_go(
-        #     False, # True=Clockwise, False=Counter-Clockwise
-        #     "Full" , # Step type (Full,Half,1/4,1/8,1/16,1/32)
-        #     toStep(_downCW), # number of steps
-        #     .0005, # step delay [sec]
-        #     False, # True = print verbose output 
-        #     .05
-        # ) # initial delay [sec]
+        print(f"{self.step_a }downArmCW")
+         self.step_a.motor_go(
+             False, # True=Clockwise, False=Counter-Clockwise
+             "Full" , # Step type (Full,Half,1/4,1/8,1/16,1/32)
+             toStep(_downCW -3), # number of steps
+             .0005, # step delay [sec]
+            False, # True = print verbose output
+             .05
+         ) # initial delay [sec]
+         self.step_a.motor_go(
+             False, # True=Clockwise, False=Counter-Clockwise
+             "Full" , # Step type (Full,Half,1/4,1/8,1/16,1/32)
+             toStep(_downCW), # number of steps
+             .0005, # step delay [sec]
+             False, # True = print verbose output
+             .05
+         ) # initial delay [sec]
 
     def backArmCW(self):
         print(f"{self.step_a}backArmCW")
-        # step_a.motor_go(
-        #     False, # True=Clockwise, False=Counter-Clockwise
-        #     "Full" , # Step type (Full,Half,1/4,1/8,1/16,1/32)
-        #     toStep(_backCW -2), # number of steps
-        #     .0005, # step delay [sec]
-        #     False, # True = print verbose output 
-        #     .05
-        # ) # initial delay [sec]
-        # step_a.motor_go(
-        #     False, # True=Clockwise, False=Counter-Clockwise
-        #     "Full" , # Step type (Full,Half,1/4,1/8,1/16,1/32)
-        #     toStep(_backCW), # number of steps
-        #     .0005, # step delay [sec]
-        #     False, # True = print verbose output 
-        #     .05
-        # ) # initial delay [sec]
+         step_a.motor_go(
+             False, # True=Clockwise, False=Counter-Clockwise
+             "Full" , # Step type (Full,Half,1/4,1/8,1/16,1/32)
+             toStep(_backCW -2), # number of steps
+             .0005, # step delay [sec]
+             False, # True = print verbose output
+             .05
+         ) # initial delay [sec]
+         step_a.motor_go(
+             False, # True=Clockwise, False=Counter-Clockwise
+             "Full" , # Step type (Full,Half,1/4,1/8,1/16,1/32)
+             toStep(_backCW), # number of steps
+             .0005, # step delay [sec]
+             False, # True = print verbose output
+             .05
+         ) # initial delay [sec]
 
     def downArmCCW(self):
         print(f"{self.step_b} downArmCCW")
-        # step_b.motor_go(
-        #     False, # True=Clockwise, False=Counter-Clockwise
-        #     "Full" , # Step type (Full,Half,1/4,1/8,1/16,1/32)
-        #     toStep(_downCCW), # number of steps
-        #     .0005, # step delay [sec]
-        #     False, # True = print verbose output 
-        #     .05
-        # ) # initial delay [sec]
+         step_b.motor_go(
+             False, # True=Clockwise, False=Counter-Clockwise
+             "Full" , # Step type (Full,Half,1/4,1/8,1/16,1/32)
+             toStep(_downCCW), # number of steps
+             .0005, # step delay [sec]
+             False, # True = print verbose output
+             .05
+         ) # initial delay [sec]
 
     def downArmCenter(self):
         print(f"{self.step_b} downArmCenter")
-        # step_b.motor_go(
-        #     False, # True=Clockwise, False=Counter-Clockwise
-        #     "Full" , # Step type (Full,Half,1/4,1/8,1/16,1/32)
-        #     toStep(_downMid), # number of steps
-        #     .0005, # step delay [sec]
-        #     False, # True = print verbose output 
-        #     .05
-        # ) # initial delay [sec]
+        self.step_b.motor_go(
+            False,  # True=Clockwise, False=Counter-Clockwise
+            "Full",  # Step type (Full,Half,1/4,1/8,1/16,1/32)
+            self.toStep(self._downMid),  # number of steps
+            .0005,  # step delay [sec]
+            False,  # True = print verbose output
+            .05
+        )  # initial delay [sec]
 
     def downArmOpen(self):
         print(f"{self.servo_a} downArmOpen Servo")
-        #self.servo_a.angle = _downOpen
+        self.servo_a.angle = _downOpen
 
     def downArmClose(self):
         print(f"{self.servo_b} downArmClose Servo")
-        #self.servo_a.angle = _downClose
+        self.servo_a.angle = _downClose
 
     def backArmOpen(self):
         print(f"{self.servo_b} backArmOpen Servo")
-        #self.servo_b.angle = _backOpen
+        self.servo_b.angle = _backOpen
 
     def backArmClose(self):
-        print( f"{self.servo_b} + backArmClose Servo")
-        #self.servo_b.angle = _backClose
+        print(f"{self.servo_b} + backArmClose Servo")
+        self.servo_b.angle = _backClose
 
     def downArm_OpenCenterClose(self):
         self.downArmOpen()
         self.downArmCenter()
         self.downArmClose()
         self.reseat()
-
 
     def backArm_OpenCenterClose(self):
         self.backArmOpen()
@@ -393,4 +387,6 @@ class Cube:
         self.downArmClose()
         self.reseat()
 
+
 cube = Cube().begin(1)
+
