@@ -78,26 +78,26 @@ class Cube:
 
     def seize(self):
         print("Seize ")
-    #     self.servo_a.angle = self._downClose + self.SEIZE
-    #     self.servo_b.angle = self._backClose  + self.SEIZE
+        self.servo_a.angle = self._downClose + self.SEIZE
+        self.servo_b.angle = self._backClose  + self.SEIZE
 
     def reseat(self):
         print("Reseat")
-        # self.servo_a.angle = self._downClose + self.SEIZE + 4
-        # self.servo_b.angle = self._backClose + self.SEIZE + 4
-        # self.delay(50)
-        # self.servo_a.angle = self._downClose
-        # self.servo_b.angle = self._backClose
+        self.servo_a.angle = self._downClose + self.SEIZE + 4
+        self.servo_b.angle = self._backClose + self.SEIZE + 4
+        self.delay(50)
+        self.servo_a.angle = self._downClose
+        self.servo_b.angle = self._backClose
 
     def gripSoft(self):
         print(f" GripSoft {self._downClose} + {self.SEIZE - 2}")
-        # self.servo_a.angle = self._downClose + self.SEIZE - 2
-        # self.servo_b.angle = self._backClose + self.SEIZE - 2
+        self.servo_a.angle = self._downClose + self.SEIZE - 2
+        self.servo_b.angle = self._backClose + self.SEIZE - 2
 
     def free(self):
         print(f" Free {self._downClose} + {self.SEIZE + 2}")
-        # self.servo_a.angle = self._downClose + self.SEIZE + 2
-        # self.servo_b.angle = self._backClose + self.SEIZE + 2
+        self.servo_a.angle = self._downClose + self.SEIZE + 2
+        self.servo_b.angle = self._backClose + self.SEIZE + 2
 
     # rubik sides
 
@@ -258,22 +258,22 @@ class Cube:
 
     def backArmCCW(self):
         print(f"{self.step_b} + {self.step_a}  backArmCCW")
-        # step_b.motor_go(
-        #     True, # True=Clockwise, False=Counter-Clockwise
-        #     "Full" , # Step type (Full,Half,1/4,1/8,1/16,1/32)
-        #     toStep(_backCCW), # number of steps
-        #     .0005, # step delay [sec]
-        #     False, # True = print verbose output
-        #     .05
-        # ) # initial delay [sec]
-        # step_a.motor_go(
-        #     False, # True=Clockwise, False=Counter-Clockwise
-        #     "Full" , # Step type (Full,Half,1/4,1/8,1/16,1/32)
-        #     toStep(_backCCW), # number of steps
-        #     .0005, # step delay [sec]
-        #     False, # True = print verbose output
-        #     .05
-        # ) # initial delay [sec]
+        step_b.motor_go(
+             True, # True=Clockwise, False=Counter-Clockwise
+             "Full" , # Step type (Full,Half,1/4,1/8,1/16,1/32)
+             toStep(_backCCW), # number of steps
+             .0005, # step delay [sec]
+             False, # True = print verbose output
+             .05
+         ) # initial delay [sec]
+         step_a.motor_go(
+             False, # True=Clockwise, False=Counter-Clockwise
+             "Full" , # Step type (Full,Half,1/4,1/8,1/16,1/32)
+             toStep(_backCCW), # number of steps
+             .0005, # step delay [sec]
+             False, # True = print verbose output
+             .05
+         ) # initial delay [sec]
 
     def downArmCW(self):
         print(f"{self.step_a }downArmCW")
@@ -389,4 +389,6 @@ class Cube:
 
 
 cube = Cube().begin(1)
+time.sleep(3)
+cube.grip()
 
