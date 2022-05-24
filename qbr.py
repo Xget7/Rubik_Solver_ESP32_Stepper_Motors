@@ -34,7 +34,7 @@ class Qbr:
     def __init__(self, normalize):
         self.normalize = normalize
 
-    def swichCaseCube(solution = []):
+    def swichCaseCube(self,solution = []):
         for i in solution:
             index = 0
             if i[index] == 'R':
@@ -143,10 +143,20 @@ class Qbr:
         print(i18n.t('startingPosition'))
         print(i18n.t('moves', moves=length))
         print(i18n.t('solution', algorithm=algorithm))
-        return algorithm
-
-        #la TECA es aca
-                
+        solutionList = list(algorithm)
+        solutionList.append(" ")
+        sol = []
+        fin = []
+        for i in solutionList:
+            if i in ["U","R","D","L","F","B"]:
+                sol.append(i)
+            elif i in ["2","'"]:
+                sol.append(i)
+            elif i in " ":
+                print
+                fin.append(sol)
+                sol = []       
+        self.swichCaseCube(fin)
 
     def print_E_and_exit(self, code):
         """Print an error message based on the code and exit the program."""
@@ -173,27 +183,9 @@ if __name__ == '__main__':
     )
     args = parser.parse_args()
     # Run Qbr with all arguments.
-    qbr = Qbr(args.normalize)
-
-    solution = qbr.run()
+    qbr = Qbr(args.normalize).run()
     
-    solutionList = list(solution)
-    solutionList.append(" ")
-    sol = []
-    fin = []
-        
-    for i in solutionList:
-        if i in ["U","R","D","L","F","B"]:
-            sol.append(i)
-        elif i in ["2","'"]:
-            sol.append(i)
-        elif i in " ":
-            print
-            fin.append(sol)
-            sol = []
-
-
-    qbr.swichCaseCube(fin)
+    
   
     
 
