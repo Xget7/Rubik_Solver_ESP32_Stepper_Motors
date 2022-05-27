@@ -9,24 +9,17 @@ import argparse
 from video import webcam
 import i18n
 import os
-from config import config
 from constants import (
     ROOT_DIR,
     E_INCORRECTLY_SCANNED,
     E_ALREADY_SOLVED
 )
 
-# Set default locale.
-locale = config.get_setting('locale')
-if not locale:
-    config.set_setting('locale', 'en')
-    locale = config.get_setting('locale')
-
 # Init i18n.
 i18n.load_path.append(os.path.join(ROOT_DIR, 'translations'))
 i18n.set('filename_format', '{locale}.{format}')
 i18n.set('file_format', 'json')
-i18n.set('locale', locale)
+i18n.set('locale', 'en')
 i18n.set('fallback', 'en')
 
 class Qbr:

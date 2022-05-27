@@ -59,6 +59,7 @@ class ColorDetection:
 
         :param bgr tuple: The BGR color to use.
         :returns: dict
+
         """
         lab = bgr2lab(bgr)
         distances = []
